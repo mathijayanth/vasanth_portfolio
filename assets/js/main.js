@@ -6,24 +6,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check local storage for theme
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme) {
-        body.classList.remove('light-mode', 'dark-mode');
         body.classList.add(currentTheme);
         updateThemeIcon(currentTheme);
     }
     
-    themeBtn.addEventListener('click', () => {
-        if (body.classList.contains('light-mode')) {
-            body.classList.replace('light-mode', 'dark-mode');
-            localStorage.setItem('theme', 'dark-mode');
-            updateThemeIcon('dark-mode');
-        } else {
-            body.classList.replace('dark-mode', 'light-mode');
-            localStorage.setItem('theme', 'light-mode');
-            updateThemeIcon('light-mode');
-        }
-    });
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark-mode' : '');
+            updateThemeIcon(isDark ? 'dark-mode' : '');
+        });
+    }
 
     function updateThemeIcon(theme) {
+        if (!themeBtn) return;
         const icon = themeBtn.querySelector('i');
         if (theme === 'dark-mode') {
             icon.classList.replace('bx-moon', 'bx-sun');
@@ -59,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const sectionHeight = current.offsetHeight;
             const sectionTop = current.offsetTop - 100;
             const sectionId = current.getAttribute('id');
-            const navLink = document.querySelector('.nav-menu a[href*=' + sectionId + ']');
+            const navLink = document.querySelector(`.nav-menu a[href="#${sectionId}"]`);
             
             if(navLink) {
-                if(scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                if(scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
                     navLink.classList.add('active');
                 } else {
                     navLink.classList.remove('active');
