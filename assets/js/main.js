@@ -35,5 +35,40 @@
     menuButton.setAttribute('aria-label', 'Open navigation');
   }));
 
+  const revealSelector = [
+    '.hero-copy > .eyebrow', '.hero-copy > h1', '.hero-copy > .hero-intro',
+    '.hero-copy > .hero-actions', '.hero-copy > .hero-facts', '.hero-art',
+    '.section-heading', '.about-grid > *', '.stat', '.skill-card',
+    '.timeline-item', '.education-card', '.school-note', '.research-card',
+    '.contact-wrap > div', '.footer-inner > *'
+  ].join(',');
+  const revealItems = document.querySelectorAll(revealSelector);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.classList.add('js-motion');
+
+  revealItems.forEach((item, index) => {
+    item.setAttribute('data-reveal', '');
+    const siblings = Array.from(item.parentElement.children).filter((child) =>
+      child.matches('.skill-card, .timeline-item, .education-card, .research-card, .stat')
+    );
+    const position = siblings.length ? siblings.indexOf(item) : index % 3;
+    item.style.setProperty('--reveal-delay', `${Math.max(position, 0) * 80}ms`);
+    if (item.matches('.hero-art, .research-card:nth-child(even)')) item.dataset.reveal = 'from-right';
+    if (item.matches('.about-image')) item.dataset.reveal = 'from-left';
+  });
+
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealItems.forEach((item) => item.classList.add('is-visible'));
+  } else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -32px 0px' });
+    revealItems.forEach((item) => revealObserver.observe(item));
+  }
+
   document.querySelector('#year').textContent = new Date().getFullYear();
 })();
