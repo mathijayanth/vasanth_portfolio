@@ -75,7 +75,7 @@ ul {
 }
 
 .mb-4 {
-    margin-bottom: 2rem;
+    margin-bottom: 3.5rem;
 }
 
 /* Utility Classes */
@@ -389,6 +389,8 @@ body.dark-mode .navbar {
     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
     position: relative;
     overflow: hidden;
+    /* Fix for Safari border-radius clipping with absolute children */
+    transform: translateZ(0);
 }
 
 .minimal-card::before {
@@ -405,7 +407,7 @@ body.dark-mode .navbar {
 }
 
 .minimal-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-6px) translateZ(0);
     box-shadow: 0 20px 40px rgba(0,0,0,0.08);
     border-color: transparent;
 }
@@ -573,10 +575,55 @@ body.dark-mode .navbar {
     }
     
     .nav-menu {
-        display: none; 
+        position: fixed;
+        top: 70px; /* Below navbar */
+        left: 0;
+        width: 100%;
+        background-color: var(--bg-color);
+        padding: 2rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        transform: translateY(-150%);
+        transition: transform 0.4s ease-in-out;
+        z-index: 99;
+        display: flex;
+        border-bottom: 1px solid var(--border-color);
     }
+    
+    .nav-menu.active {
+        transform: translateY(0);
+    }
+    
+    .nav-list {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
     .hamburger {
         display: flex;
+        z-index: 100;
+        transition: 0.3s;
+    }
+    
+    .hamburger.active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+    
+    .profile-image-container {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
     }
     
     .text-center .section-title::after {
@@ -594,5 +641,49 @@ body.dark-mode .navbar {
     
     .timeline-dot {
         left: 6px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .hero {
+        padding-top: 8rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    
+    .hero-btns {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .hero-btns .btn {
+        width: 100%;
+    }
+    
+    .profile-image-container {
+        max-width: 260px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .section {
+        padding: 4rem 0;
+    }
+    
+    .timeline-item {
+        padding-left: 40px;
     }
 }
