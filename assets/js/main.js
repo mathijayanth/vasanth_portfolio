@@ -70,5 +70,25 @@
     revealItems.forEach((item) => revealObserver.observe(item));
   }
 
+  const sectionLinks = Array.from(menu.querySelectorAll('a[href^="#"]'));
+  const pageSections = sectionLinks
+    .map((link) => document.querySelector(link.getAttribute('href')))
+    .filter(Boolean);
+  const updateActiveSection = () => {
+    const marker = window.innerHeight * 0.3;
+    const activeSection = pageSections
+      .filter((section) => section.getBoundingClientRect().top <= marker)
+      .at(-1) || pageSections[0];
+    sectionLinks.forEach((link) => {
+      const active = link.hash === `#${activeSection.id}`;
+      link.classList.toggle('is-active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  window.addEventListener('resize', updateActiveSection);
+  updateActiveSection();
+
   document.querySelector('#year').textContent = new Date().getFullYear();
 })();
