@@ -1,92 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-    /* ----- Theme Toggle Logic ----- */
-    const themeBtn = document.getElementById('theme-btn');
-    const body = document.body;
-    
-    // Check local storage for theme
-    const currentTheme = localStorage.getItem('theme');
-    if (currentTheme) {
-        body.classList.add(currentTheme);
-        updateThemeIcon(currentTheme);
-    }
-    
-    if (themeBtn) {
-        themeBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark-mode' : '');
-            updateThemeIcon(isDark ? 'dark-mode' : '');
-        });
-    }
+(() => {
+  const root = document.documentElement;
+  const themeButton = document.querySelector('.theme-toggle');
+  const themeIcon = document.querySelector('.theme-icon');
+  const menuButton = document.querySelector('.menu-toggle');
+  const menu = document.querySelector('.nav-links');
 
-    function updateThemeIcon(theme) {
-        if (!themeBtn) return;
-        const icon = themeBtn.querySelector('i');
-        if (theme === 'dark-mode') {
-            icon.classList.replace('bx-moon', 'bx-sun');
-        } else {
-            icon.classList.replace('bx-sun', 'bx-moon');
-        }
-    }
+  const storedTheme = localStorage.getItem('portfolio-theme');
+  if (storedTheme === 'dark' || storedTheme === 'light') root.dataset.theme = storedTheme;
+  updateThemeButton();
 
-    /* ----- Mobile Menu Logic ----- */
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    const navLinks = document.querySelectorAll('.nav-link');
+  themeButton.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('portfolio-theme', root.dataset.theme);
+    updateThemeButton();
+  });
 
-    hamburger.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        hamburger.classList.toggle('active'); // Optional: Add CSS to animate hamburger to X
-    });
+  function updateThemeButton() {
+    const dark = root.dataset.theme === 'dark';
+    themeIcon.textContent = dark ? '☼' : '☾';
+    themeButton.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0b1120' : '#f8fafc');
+  }
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            hamburger.classList.remove('active');
-        });
-    });
+  menuButton.addEventListener('click', () => {
+    const expanded = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!expanded));
+    menuButton.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+    menu.classList.toggle('open', !expanded);
+  });
 
-    /* ----- Scroll Active Link ----- */
-    const sections = document.querySelectorAll('section[id]');
-    
-    window.addEventListener('scroll', () => {
-        let scrollY = window.pageYOffset;
-        
-        sections.forEach(current => {
-            const sectionHeight = current.offsetHeight;
-            const sectionTop = current.offsetTop - 100;
-            const sectionId = current.getAttribute('id');
-            const navLink = document.querySelector(`.nav-menu a[href="#${sectionId}"]`);
-            
-            if(navLink) {
-                if(scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-                    navLink.classList.add('active');
-                } else {
-                    navLink.classList.remove('active');
-                }
-            }
-        });
-    });
+  menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+    menu.classList.remove('open');
+    menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'Open navigation');
+  }));
 
-    /* ----- Scroll Reveal Animation ----- */
-    const revealElements = document.querySelectorAll('.reveal, .reveal-right');
-    
-    const revealCallback = (entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                // Optional: Stop observing once revealed
-                // observer.unobserve(entry.target); 
-            }
-        });
-    };
-    
-    const revealObserver = new IntersectionObserver(revealCallback, {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px"
-    });
-    
-    revealElements.forEach(el => {
-        revealObserver.observe(el);
-    });
-});
+  document.querySelector('#year').textContent = new Date().getFullYear();
+})();
